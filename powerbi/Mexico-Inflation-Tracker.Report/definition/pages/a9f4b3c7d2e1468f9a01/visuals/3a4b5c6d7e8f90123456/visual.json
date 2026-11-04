@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "3a4b5c6d7e8f90123456",
+  "position": {
+    "x": 870,
+    "y": 30,
+    "z": 0,
+    "height": 150,
+    "width": 360,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_INPC"
+                    }
+                  },
+                  "Property": "INPC_Promedio3M"
+                }
+              },
+              "queryRef": "Fact_INPC.INPC_Promedio3M",
+              "nativeQueryRef": "Promedio móvil 3M"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
