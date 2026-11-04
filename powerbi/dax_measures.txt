@@ -1,9 +1,20 @@
-// COPIA/PEGA EN POWER BI - TABLA _Medidas
-
+// Mexico Inflation Tracker — model measures
 INPC_Actual = SUM(Fact_INPC[INPC])
 
-INPC_AñoAnterior = CALCULATE([INPC_Actual], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+INPC_AñoAnterior =
+CALCULATE([INPC_Actual], SAMEPERIODLASTYEAR(Dim_Date[Date]))
 
-Inflacion_YoY = DIVIDE([INPC_Actual] - [INPC_AñoAnterior], [INPC_AñoAnterior])
+Inflacion_YoY =
+DIVIDE([INPC_Actual] - [INPC_AñoAnterior], [INPC_AñoAnterior])
 
-INPC_Promedio3M = CALCULATE(AVERAGEX(DATESINPERIOD(Dim_Date[Date], MAX(Dim_Date[Date]), -3, MONTH), [INPC_Actual]))
+// Average of the latest 3 available monthly index observations
+INPC_Promedio3M =
+VAR FechaCorte = MAX(Dim_Date[Date])
+VAR UltimasTresObservaciones =
+    TOPN(
+        3,
+        FILTER(ALL(Fact_INPC[Fecha]), Fact_INPC[Fecha] <= FechaCorte),
+        Fact_INPC[Fecha], DESC
+    )
+RETURN
+    AVERAGEX(UltimasTresObservaciones, CALCULATE([INPC_Actual]))
