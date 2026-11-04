@@ -1,0 +1,11 @@
+# Power BI temp
+*.tmp
+~$*
+# Python
+__pycache__/
+*.pyc
+.env
+# Data large
+data/silver/
+data/gold/
+*.pbix
