@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import math
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -31,8 +32,8 @@ def main() -> None:
             value = float(row["INPC"])
         except (KeyError, ValueError, TypeError) as exc:
             raise SystemExit(f"Gold validation failed: invalid Silver row: {row!r}") from exc
-        if value <= 0:
-            raise SystemExit(f"Gold validation failed: non-positive INPC on {day.isoformat()}.")
+        if not math.isfinite(value) or value <= 0:
+            raise SystemExit(f"Gold validation failed: INPC must be finite and positive on {day.isoformat()}.")
         fact_rows.append((day, value, day.year, day.month))
 
     fact_rows.sort(key=lambda item: item[0])
