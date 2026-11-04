@@ -1,0 +1,4 @@
+relationship 7a19a4dd-5c38-44e0-8b13-c98cc40f9012
+    fromColumn: Fact_INPC.Fecha
+    toColumn: Dim_Date.Date
+    isActive: true

@@ -1,0 +1,5 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {"type": "SemanticModel", "displayName": "Mexico Inflation Tracker"},
+  "config": {"version": "2.0", "logicalId": "9e4c16b3-6b0a-4d47-a15c-0b3f4e4c2d10"}
+}

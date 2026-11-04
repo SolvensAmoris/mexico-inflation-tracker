@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "2a3b4c5d6e7f89012345",
+  "position": {
+    "x": 450,
+    "y": 30,
+    "z": 0,
+    "height": 150,
+    "width": 360,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_INPC"
+                    }
+                  },
+                  "Property": "Inflacion_YoY"
+                }
+              },
+              "queryRef": "Fact_INPC.Inflacion_YoY",
+              "nativeQueryRef": "Inflación interanual"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

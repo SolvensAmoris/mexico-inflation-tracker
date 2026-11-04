@@ -1,23 +1,36 @@
-from pyspark.sql.functions import col, to_date, year, month, trim
+#!/usr/bin/env python3
+"""Validate and normalize Bronze INPC observations into the Silver layer."""
+from __future__ import annotations
+import csv
+from datetime import date
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / "data" / "bronze" / "inpc.csv"
+OUTPUT = ROOT / "data" / "silver" / "inpc.csv"
 
-# Leer Bronze
-df = spark.read.format("delta").load("/mnt/bronze/inpc")
+def main() -> None:
+    if not SOURCE.exists():
+        raise SystemExit("Missing Bronze data. Run notebooks/01_Bronze_Ingestion.py first.")
+    rows: dict[date, float] = {}
+    with SOURCE.open(newline="", encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle):
+            try:
+                day = date.fromisoformat(row["Fecha"].strip())
+                value = float(row["INPC"])
+            except (KeyError, ValueError, AttributeError):
+                continue
+            if value > 0:
+                rows[day] = value
+    if not rows:
+        raise SystemExit("Silver validation failed: no valid Fecha/INPC rows.")
+    ordered = sorted(rows.items())
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    with OUTPUT.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["Fecha", "INPC", "Year", "Month"])
+        for day, value in ordered:
+            writer.writerow([day.isoformat(), f"{value:.6f}", day.year, day.month])
+    print(f"Silver OK: {len(ordered)} unique monthly observations -> {OUTPUT.relative_to(ROOT)}")
 
-# Limpieza Banxico viene con espacios
-df_clean = df.withColumn("Fecha", trim(col("Fecha"))) \
-             .withColumn("INPC", trim(col("INPC")))
-
-# Cast correcto
-df_cast = df_clean.withColumn("Fecha", to_date(col("Fecha"), "dd/MM/yyyy")) \
-                  .withColumn("INPC", col("INPC").cast("double")) \
-                  .dropna(subset=["Fecha","INPC"])
-
-df_final = df_cast.withColumn("Year", year(col("Fecha"))) \
-                  .withColumn("Month", month(col("Fecha")))
-
-print(f"Silver count: {df_final.count()}")
-df_final.display()
-
-# Guardar Silver
-df_final.write.format("delta").mode("overwrite").save("/mnt/silver/inpc")
-print("Silver OK - STARKCORE verified")
+if __name__ == "__main__":
+    main()

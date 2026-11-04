@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "name": "1a2b3c4d5e6f78901234",
+  "position": {
+    "x": 30,
+    "y": 30,
+    "z": 0,
+    "height": 150,
+    "width": 360,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_INPC"
+                    }
+                  },
+                  "Property": "INPC_Actual"
+                }
+              },
+              "queryRef": "Fact_INPC.INPC_Actual",
+              "nativeQueryRef": "INPC actual"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
