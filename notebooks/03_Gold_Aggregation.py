@@ -2,7 +2,7 @@
 """Build Power BI star-schema CSV outputs from Silver INPC data."""
 from __future__ import annotations
 import csv
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "silver" / "inpc.csv"
@@ -15,25 +15,29 @@ def main() -> None:
         rows = list(csv.DictReader(handle))
     if not rows:
         raise SystemExit("Gold aggregation failed: Silver dataset is empty.")
-    fact_rows, dates = [], set()
+    fact_rows = []
     for row in rows:
         day, value = date.fromisoformat(row["Fecha"]), float(row["INPC"])
         fact_rows.append((day, value, day.year, day.month))
-        dates.add(day)
     fact_rows.sort(key=lambda item: item[0])
+    if len({item[0] for item in fact_rows}) != len(fact_rows):
+        raise SystemExit("Gold validation failed: duplicate fact dates.")
     GOLD.mkdir(parents=True, exist_ok=True)
     with (GOLD / "fact_inpc.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow(["Fecha", "INPC", "Year", "Month"])
         for day, value, year, month in fact_rows:
             writer.writerow([day.isoformat(), f"{value:.6f}", year, month])
+    start, end = fact_rows[0][0], fact_rows[-1][0]
     with (GOLD / "dim_date.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow(["Date", "Year", "MonthNumber", "MonthName", "YearMonth", "Quarter"])
-        for day in sorted(dates):
+        day = start
+        while day <= end:
             writer.writerow([day.isoformat(), day.year, day.month, day.strftime("%B"),
                              day.strftime("%Y-%m"), f"Q{((day.month - 1) // 3) + 1}"])
-    print(f"Gold OK: Fact_INPC={len(fact_rows)}; Dim_Date={len(dates)}")
+            day += timedelta(days=1)
+    print(f"Gold OK: Fact_INPC={len(fact_rows)} monthly observations; Dim_Date={(end-start).days + 1} calendar days")
 
 if __name__ == "__main__":
     main()
