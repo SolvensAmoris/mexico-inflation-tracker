@@ -1,11 +1,12 @@
-# Power BI temp
-*.tmp
-~$*
-# Python
-__pycache__/
-*.pyc
+# Power BI local state
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/editorSettings.json
+
+# Local credentials and generated pipeline data
 .env
-# Data large
+.env.*
+!.env.example
+data/bronze/
 data/silver/
 data/gold/
-*.pbix
