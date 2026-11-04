@@ -29,7 +29,17 @@ table Fact_INPC
         sourceColumn: Month
         lineageTag: 4b2dfb23-17bb-4c62-9d11-62f7eac9f912
 
-    measure INPC_Actual = SUM(Fact_INPC[INPC])
+    measure INPC_Actual =
+            VAR FechaUltimoDato =
+                LASTNONBLANK(
+                    Dim_Date[Date],
+                    CALCULATE(COUNTROWS(Fact_INPC))
+                )
+            RETURN
+                CALCULATE(
+                    MAX(Fact_INPC[INPC]),
+                    Dim_Date[Date] = FechaUltimoDato
+                )
         formatString: 0.0000
         lineageTag: 1d18adf0-68b0-42dd-88b8-c5f5e3cbb0a1
 
@@ -50,7 +60,7 @@ table Fact_INPC
                     Fact_INPC[Fecha], DESC
                 )
             RETURN
-                AVERAGEX(UltimasTresObservaciones, CALCULATE([INPC_Actual]))
+                AVERAGEX(UltimasTresObservaciones, CALCULATE(MAX(Fact_INPC[INPC])))
         formatString: 0.0000
         lineageTag: 1d18adf0-68b0-42dd-88b8-c5f5e3cbb0a4
 
