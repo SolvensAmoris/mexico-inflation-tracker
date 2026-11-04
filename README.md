@@ -1,14 +1,27 @@
-# Mexico Inflation Tracker
+# Mexico Inflation Tracker | INPC - Banxico
 
-End-to-end pipeline analyzing Mexican INPC from Banxico CP154.
-Bronze/Silver/Gold with Databricks + Power BI.
+> WE DON'T NEED MORE EXPLANATIONS. WE NEED EVIDENCE.
+> STARKCORE C4-002 Verified
 
 ## Stack
-Databricks, PySpark, DLT, Unity Catalog, Power BI, DAX
-
-## Architecture
-- Bronze: Auto Loader CP154 CSV
+- Bronze: Banxico CP154 -> Delta
 - Silver: PySpark cleaning
-- Gold: Star Schema
+- Gold: Star Schema for Power BI
+- Viz: DAX YoY + 3M Avg
 
-StarkCore userland - Built for Canada market.
+## Estructura
+notebooks/
+ 01_Bronze_Ingestion.py
+ 02_Silver_Transformation.py
+ 03_Gold_Aggregation.py
+powerbi/
+ dax_measures.txt
+
+## Metricas DAX
+- INPC_Actual = SUM(Fact_INPC[INPC])
+- Inflacion_YoY = DIVIDE(Actual - AñoAnterior, AñoAnterior)
+- INPC_Promedio3M = Rolling 3M
+
+## Evidencia
+https://github.com/SolvensAmoris/mexico-inflation-tracker
+Built in StarkCore - Ensenada 9:30PM
