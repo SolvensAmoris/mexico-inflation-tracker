@@ -1,0 +1,47 @@
+name: Refresh official INPC data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 14 15 * *"
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    name: Fetch, validate, and package Banxico INPC
+    runs-on: ubuntu-latest
+    env:
+      BANXICO_TOKEN: ${{ secrets.BANXICO_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Require Banxico credential
+        shell: bash
+        run: |
+          if [ -z "$BANXICO_TOKEN" ]; then
+            echo "::error::Repository secret BANXICO_TOKEN is missing. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+      - name: Download official SP1 observations (Bronze)
+        run: python notebooks/01_Bronze_Ingestion.py
+      - name: Validate and normalize observations (Silver)
+        run: python notebooks/02_Silver_Transformation.py
+      - name: Build Power BI tables (Gold)
+        run: python notebooks/03_Gold_Aggregation.py
+      - name: Upload refresh data
+        uses: actions/upload-artifact@v4
+        with:
+          name: mexico-inpc-gold-${{ github.run_id }}
+          path: |
+            data/bronze/inpc.csv
+            data/silver/inpc.csv
+            data/gold/fact_inpc.csv
+            data/gold/dim_date.csv
+          if-no-files-found: error
+          retention-days: 90
