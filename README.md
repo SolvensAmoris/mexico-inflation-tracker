@@ -10,6 +10,9 @@
 [![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Power BI Project](https://img.shields.io/badge/Power%20BI-PBIP%20%7C%20PBIR-F2C811?logo=powerbi&logoColor=111111)](https://learn.microsoft.com/power-bi/developer/projects/projects-overview)
 [![Data source](https://img.shields.io/badge/data-Banxico%20SIE%20SP1-0B6E4F)](https://www.banxico.org.mx/SieAPIRest/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Author](https://img.shields.io/badge/author-Luis%20Alberto%20Burciaga%20Miker-111111)](mailto:Luis.albm77@gmail.com)
+[![Organization](https://img.shields.io/badge/organization-StarkCore%20Labs-D4AF37)](https://github.com/SolvensAmoris)
 
 **WE DON'T NEED MORE EXPLANATIONS. WE NEED EVIDENCE.**
 
