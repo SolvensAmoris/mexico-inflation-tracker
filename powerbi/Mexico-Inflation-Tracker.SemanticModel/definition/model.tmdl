@@ -1,0 +1,9 @@
+model Model
+    culture: es-MX
+    defaultPowerBIDataSourceVersion: powerBI_V3
+    sourceQueryCulture: es-MX
+    dataAccessOptions
+        legacyRedirects
+        returnErrorValuesAsNull
+
+    annotation PBI_ProTooling = ["DevMode"]
