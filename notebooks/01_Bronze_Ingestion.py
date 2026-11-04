@@ -8,11 +8,12 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import os
 import sys
 import urllib.error
 import urllib.request
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +55,6 @@ def main() -> int:
         if not raw_value or raw_value.upper() in {"N/E", "N/D", "NA"}:
             continue
         # SIE API dates are commonly dd/MM/yyyy.
-        from datetime import datetime
         try:
             parsed_date = datetime.strptime(raw_date, "%d/%m/%Y").date()
         except ValueError:
@@ -65,6 +65,8 @@ def main() -> int:
         try:
             value = float(raw_value.replace(",", ""))
         except ValueError:
+            continue
+        if not math.isfinite(value) or value <= 0:
             continue
         rows.append((parsed_date.isoformat(), value))
 
