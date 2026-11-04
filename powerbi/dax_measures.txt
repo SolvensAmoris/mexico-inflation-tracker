@@ -1,0 +1,9 @@
+// COPIA/PEGA EN POWER BI - TABLA _Medidas
+
+INPC_Actual = SUM(Fact_INPC[INPC])
+
+INPC_AñoAnterior = CALCULATE([INPC_Actual], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+
+Inflacion_YoY = DIVIDE([INPC_Actual] - [INPC_AñoAnterior], [INPC_AñoAnterior])
+
+INPC_Promedio3M = CALCULATE(AVERAGEX(DATESINPERIOD(Dim_Date[Date], MAX(Dim_Date[Date]), -3, MONTH), [INPC_Actual]))
