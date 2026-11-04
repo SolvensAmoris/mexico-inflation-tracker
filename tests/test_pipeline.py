@@ -39,6 +39,8 @@ class PipelineTests(unittest.TestCase):
                 ["2024-02-01", "133.2"],
                 ["2024-01-01", "132.5"],
                 ["bad-date", "not-a-number"],
+                ["2024-03-01", "NaN"],
+                ["2024-04-01", "inf"],
             ])
             with patch.object(silver, "SOURCE", source), patch.object(silver, "OUTPUT", output), patch.object(silver, "ROOT", root):
                 silver.main()

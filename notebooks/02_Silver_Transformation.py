@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import math
 from datetime import date
 from pathlib import Path
 
@@ -22,8 +23,8 @@ def main() -> None:
             try:
                 day = date.fromisoformat(row["Fecha"].strip())
                 value = float(row["INPC"])
-                if value <= 0:
-                    raise ValueError("INPC must be positive")
+                if not math.isfinite(value) or value <= 0:
+                    raise ValueError("INPC must be finite and positive")
             except (KeyError, ValueError, AttributeError):
                 invalid_rows += 1
                 continue
