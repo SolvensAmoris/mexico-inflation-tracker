@@ -1,13 +1,30 @@
 // Mexico Inflation Tracker — model measures
-INPC_Actual = SUM(Fact_INPC[INPC])
+// Returns the latest available index in the current date context.
+INPC_Actual =
+VAR FechaUltimoDato =
+    LASTNONBLANK(
+        Dim_Date[Date],
+        CALCULATE(COUNTROWS(Fact_INPC))
+    )
+RETURN
+    CALCULATE(
+        MAX(Fact_INPC[INPC]),
+        Dim_Date[Date] = FechaUltimoDato
+    )
 
 INPC_AñoAnterior =
-CALCULATE([INPC_Actual], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+CALCULATE(
+    [INPC_Actual],
+    SAMEPERIODLASTYEAR(Dim_Date[Date])
+)
 
 Inflacion_YoY =
-DIVIDE([INPC_Actual] - [INPC_AñoAnterior], [INPC_AñoAnterior])
+DIVIDE(
+    [INPC_Actual] - [INPC_AñoAnterior],
+    [INPC_AñoAnterior]
+)
 
-// Average of the latest 3 available monthly index observations
+// Average of the latest 3 available monthly index observations.
 INPC_Promedio3M =
 VAR FechaCorte = MAX(Dim_Date[Date])
 VAR UltimasTresObservaciones =
@@ -17,4 +34,7 @@ VAR UltimasTresObservaciones =
         Fact_INPC[Fecha], DESC
     )
 RETURN
-    AVERAGEX(UltimasTresObservaciones, CALCULATE([INPC_Actual]))
+    AVERAGEX(
+        UltimasTresObservaciones,
+        CALCULATE(MAX(Fact_INPC[INPC]))
+    )
