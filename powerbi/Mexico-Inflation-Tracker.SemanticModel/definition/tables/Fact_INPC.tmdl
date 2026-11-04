@@ -1,0 +1,87 @@
+table Fact_INPC
+    lineageTag: 9cddc870-60cb-4bd7-b09b-315c85a8a0e1
+
+    column Fecha
+        dataType: dateTime
+        formatString: Short Date
+        summarizeBy: none
+        sourceColumn: Fecha
+        lineageTag: 9129b2a0-3a30-41a0-9e51-ff88f2a80d4a
+
+    column INPC
+        dataType: double
+        formatString: 0.0000
+        summarizeBy: sum
+        sourceColumn: INPC
+        lineageTag: 8f7c5d5a-22d2-4c72-9c4e-b6a9db3d4c11
+
+    column Year
+        dataType: int64
+        formatString: 0
+        summarizeBy: none
+        sourceColumn: Year
+        lineageTag: a9d2cc42-5f63-4f2a-9a18-9b7e66d0f101
+
+    column Month
+        dataType: int64
+        formatString: 0
+        summarizeBy: none
+        sourceColumn: Month
+        lineageTag: 4b2dfb23-17bb-4c62-9d11-62f7eac9f912
+
+    measure INPC_Actual = SUM(Fact_INPC[INPC])
+        formatString: 0.0000
+        lineageTag: 1d18adf0-68b0-42dd-88b8-c5f5e3cbb0a1
+
+    measure INPC_AñoAnterior = CALCULATE([INPC_Actual], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+        formatString: 0.0000
+        lineageTag: 1d18adf0-68b0-42dd-88b8-c5f5e3cbb0a2
+
+    measure Inflacion_YoY = DIVIDE([INPC_Actual] - [INPC_AñoAnterior], [INPC_AñoAnterior])
+        formatString: 0.00%;-0.00%;0.00%
+        lineageTag: 1d18adf0-68b0-42dd-88b8-c5f5e3cbb0a3
+
+    measure INPC_Promedio3M =
+            VAR FechaCorte = MAX(Dim_Date[Date])
+            VAR UltimasTresObservaciones =
+                TOPN(
+                    3,
+                    FILTER(ALL(Fact_INPC[Fecha]), Fact_INPC[Fecha] <= FechaCorte),
+                    Fact_INPC[Fecha], DESC
+                )
+            RETURN
+                AVERAGEX(UltimasTresObservaciones, CALCULATE([INPC_Actual]))
+        formatString: 0.0000
+        lineageTag: 1d18adf0-68b0-42dd-88b8-c5f5e3cbb0a4
+
+    partition Fact_INPC = m
+        mode: import
+        source =
+                let
+                    StartDate = "1969-01-01",
+                    EndDate = Date.ToText(Date.From(DateTime.LocalNow()), "yyyy-MM-dd"),
+                    RelativePath = "service/v1/series/SP1/datos/" & StartDate & "/" & EndDate,
+                    Response = Json.Document(
+                        Web.Contents(
+                            "https://www.banxico.org.mx/SieAPIRest/",
+                            [
+                                RelativePath = RelativePath,
+                                Headers = [#"Bmx-Token" = BanxicoToken, Accept = "application/json"]
+                            ]
+                        )
+                    ),
+                    Series = Response[bmx][series]{0}[datos],
+                    AsTable = Table.FromRecords(Series),
+                    ValidRows = Table.SelectRows(AsTable, each [dato] <> "N/E" and [dato] <> "N/D"),
+                    Renamed = Table.RenameColumns(ValidRows, {{"fecha", "Fecha"}, {"dato", "INPC"}}),
+                    Typed = Table.TransformColumns(
+                        Renamed,
+                        {
+                            {"Fecha", each Date.FromText(_, [Culture = "es-MX"]), type date},
+                            {"INPC", each Number.FromText(_, "en-US"), type number}
+                        }
+                    ),
+                    AddYear = Table.AddColumn(Typed, "Year", each Date.Year([Fecha]), Int64.Type),
+                    AddMonth = Table.AddColumn(AddYear, "Month", each Date.Month([Fecha]), Int64.Type)
+                in
+                    AddMonth
