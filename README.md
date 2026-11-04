@@ -84,8 +84,9 @@ The workflow also runs monthly. Artifacts are retained for 90 days. A successful
 1. Open powerbi/Mexico-Inflation-Tracker.pbip in Power BI Desktop.
 2. In Transform data → Manage parameters, set BanxicoToken locally. Do not commit it.
 3. Configure Web data source credentials/privacy level if prompted.
-4. Refresh and inspect the model/report.
-5. Save the project, then use File → Save as → Power BI Desktop (.pbix) to create the native binary deliverable.
+4. In Model view, mark Dim_Date[Date] as the date table (Table tools → Mark as date table → Date). The prior-year measure uses classic SAMEPERIODLASTYEAR time intelligence.
+5. Refresh and inspect the model/report.
+6. Save the project, then use File → Save as → Power BI Desktop (.pbix) to create the native binary deliverable.
 
 **Important:** PBIP is the source-controlled project format. This repository does not claim to contain a generated or Desktop-validated PBIX.
 
